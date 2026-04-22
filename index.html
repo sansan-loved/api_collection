@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>API 收藏夹</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=Noto+Sans+SC:wght@300;400;500;600;700;900&display=swap" rel="stylesheet">
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<!-- ===== 顶部导航 ===== -->
+<header class="topbar">
+  <div class="topbar-left">
+    <div class="logo">
+      <div class="logo-icon"><i class="fas fa-bookmark"></i></div>
+      <span>API 收藏夹</span>
+    </div>
+    <div class="stats-bar">
+      <div class="stat-chip">
+        <i class="fas fa-layer-group" style="font-size:11px"></i>
+        已收藏 <span class="num">12</span> 个 API
+      </div>
+      <div class="stat-chip">
+        <i class="fas fa-fire" style="font-size:11px"></i>
+        热门标签 <span class="num">GitHub · 天气 · 翻译</span>
+      </div>
+    </div>
+  </div>
+  <div class="topbar-right">
+    <div class="search-box">
+      <i class="fas fa-search"></i>
+      <input type="text" placeholder="搜索标题、URL、描述、标签..." id="searchInput">
+      <span class="search-shortcut">⌘K</span>
+    </div>
+    <button class="btn" id="importBtn">
+      <i class="fas fa-file-import"></i> 导入
+    </button>
+    <button class="btn" id="exportBtn">
+      <i class="fas fa-file-export"></i> 导出
+    </button>
+    <button class="btn btn-accent" id="addApiBtn">
+      <i class="fas fa-plus"></i> 新增 API
+    </button>
+  </div>
+</header>
+
+<!-- ===== 主布局 ===== -->
+<div class="main-layout">
+  <!-- 左侧边栏 -->
+  <aside class="sidebar">
+    <div class="sidebar-title">导航</div>
+    <div class="tag-list">
+      <!-- 全部 API（可展开/折叠的父级目录） -->
+      <div class="tag-parent active" onclick="toggleTree(this)">
+        <div class="tag-parent-left">
+          <span class="tree-arrow expanded"><i class="fas fa-chevron-right"></i></span>
+          <span class="tree-icon"><i class="fas fa-layer-group"></i></span>
+          全部 API
+        </div>
+        <span class="tag-count">12</span>
+      </div>
+      <!-- 子标签列表 -->
+      <div class="tag-children expanded">
+        <div class="tag-item active" onclick="selectTag(this)">
+          <div class="tag-item-left">
+            <div class="tag-dot" style="background:var(--text-muted)"></div>
+            全部
+          </div>
+          <span class="tag-count">12</span>
+        </div>
+        <div class="tag-item" onclick="selectTag(this)">
+          <div class="tag-item-left">
+            <div class="tag-dot" style="background:var(--accent)"></div>
+            GitHub
+          </div>
+          <span class="tag-count">5</span>
+        </div>
+        <div class="tag-item" onclick="selectTag(this)">
+          <div class="tag-item-left">
+            <div class="tag-dot" style="background:var(--green)"></div>
+            天气
+          </div>
+          <span class="tag-count">3</span>
+        </div>
+        <div class="tag-item" onclick="selectTag(this)">
+          <div class="tag-item-left">
+            <div class="tag-dot" style="background:var(--purple)"></div>
+            翻译
+          </div>
+          <span class="tag-count">2</span>
+        </div>
+        <div class="tag-item" onclick="selectTag(this)">
+          <div class="tag-item-left">
+            <div class="tag-dot" style="background:var(--orange)"></div>
+            大模型
+          </div>
+          <span class="tag-count">2</span>
+        </div>
+        <div class="tag-item" onclick="selectTag(this)">
+          <div class="tag-item-left">
+            <div class="tag-dot" style="background:var(--pink)"></div>
+            免费
+          </div>
+          <span class="tag-count">4</span>
+        </div>
+        <div class="tag-item" onclick="selectTag(this)">
+          <div class="tag-item-left">
+            <div class="tag-dot" style="background:var(--yellow)"></div>
+            认证
+          </div>
+          <span class="tag-count">1</span>
+        </div>
+      </div>
+    </div>
+    <div class="sidebar-footer">
+      <button class="btn btn-new-tag" id="newTagBtn">
+        <i class="fas fa-plus"></i> 新建标签
+      </button>
+    </div>
+  </aside>
+
+  <!-- 右侧主内容 -->
+  <main class="content">
+    <div class="content-header">
+      <div class="content-header-left">
+        <div class="view-toggle">
+          <button class="view-btn active" onclick="switchView('card', this)">
+            <i class="fas fa-th-large"></i> 卡片
+          </button>
+          <button class="view-btn" onclick="switchView('table', this)">
+            <i class="fas fa-list"></i> 表格
+          </button>
+        </div>
+        <span class="filter-label">显示 <span>12</span> 条结果</span>
+      </div>
+    </div>
+
+    <!-- 卡片视图 -->
+    <div class="card-grid" id="cardView">
+      <!-- API 卡片将通过 JavaScript 动态生成 -->
+    </div>
+
+    <!-- 表格视图 -->
+    <table class="table-view" id="tableView">
+      <thead>
+        <tr>
+          <th>标题</th>
+          <th>请求方式 / URL</th>
+          <th>API Key</th>
+          <th>标签</th>
+          <th>来源</th>
+          <th>操作</th>
+        </tr>
+      </thead>
+      <tbody id="tableBody">
+        <!-- 表格数据将通过 JavaScript 动态生成 -->
+      </tbody>
+    </table>
+  </main>
+</div>
+
+<!-- ===== 新增/编辑 API 弹窗 ===== -->
+<div class="modal-overlay" id="apiModal">
+  <div class="modal">
+    <div class="modal-header">
+      <h3 id="modalTitle">新增 API</h3>
+      <button class="modal-close" onclick="closeModal()"><i class="fas fa-times"></i></button>
+    </div>
+    <div class="modal-body">
+      <form id="apiForm">
+        <input type="hidden" id="apiId">
+        <div class="form-group">
+          <label class="form-label">
+            标题 <span class="required">*</span>
+          </label>
+          <input type="text" class="form-input" id="apiTitle" placeholder="API 标题" required>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">请求方式</label>
+            <select class="form-input" id="apiMethod">
+              <option value="GET">GET</option>
+              <option value="POST">POST</option>
+              <option value="PUT">PUT</option>
+              <option value="DELETE">DELETE</option>
+              <option value="PATCH">PATCH</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">
+              URL <span class="required">*</span>
+            </label>
+            <input type="text" class="form-input" id="apiUrl" placeholder="API URL" required>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">API Key</label>
+          <input type="text" class="form-input" id="apiKey" placeholder="API Key (可选)">
+        </div>
+        <div class="form-group">
+          <label class="form-label">标签</label>
+          <input type="text" class="form-input" id="apiTags" placeholder="标签，用逗号分隔">
+        </div>
+        <div class="form-group">
+          <label class="form-label">描述</label>
+          <textarea class="form-textarea" id="apiDesc" placeholder="API 描述"></textarea>
+        </div>
+        <div class="form-group">
+          <label class="form-label">文档链接</label>
+          <input type="url" class="form-input" id="apiDocs" placeholder="API 文档链接">
+        </div>
+      </form>
+    </div>
+    <div class="modal-footer">
+      <button class="btn" onclick="closeModal()">取消</button>
+      <button class="btn btn-accent" onclick="saveApi()">保存</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== 确认删除弹窗 ===== -->
+<div class="modal-overlay confirm-modal" id="confirmModal">
+  <div class="modal">
+    <div class="modal-body" style="text-align: center; padding: 32px 24px;">
+      <div class="confirm-icon"><i class="fas fa-trash"></i></div>
+      <h3 style="margin-bottom: 12px;">确认删除</h3>
+      <p class="confirm-text">确定要删除这个 API 吗？此操作无法撤销。</p>
+      <div class="confirm-actions">
+        <button class="btn" onclick="closeConfirm()">取消</button>
+        <button class="btn btn-danger" onclick="confirmDelete()">删除</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== 新增标签弹窗 ===== -->
+<div class="modal-overlay" id="tagModal">
+  <div class="modal">
+    <div class="modal-header">
+      <h3>新增标签</h3>
+      <button class="modal-close" onclick="closeTagModal()"><i class="fas fa-times"></i></button>
+    </div>
+    <div class="modal-body">
+      <form id="tagForm">
+        <div class="form-group">
+          <label class="form-label">
+            标签名称 <span class="required">*</span>
+          </label>
+          <input type="text" class="form-input" id="tagName" placeholder="请输入标签名称" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label">标签颜色</label>
+          <div class="color-picker">
+            <div class="color-options">
+              <div class="color-option active" data-color="var(--accent)"></div>
+              <div class="color-option" data-color="var(--green)"></div>
+              <div class="color-option" data-color="var(--purple)"></div>
+              <div class="color-option" data-color="var(--orange)"></div>
+              <div class="color-option" data-color="var(--pink)"></div>
+              <div class="color-option" data-color="var(--yellow)"></div>
+              <div class="color-option" data-color="var(--red)"></div>
+            </div>
+            <input type="hidden" id="tagColor" value="var(--accent)">
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">标签描述</label>
+          <textarea class="form-textarea" id="tagDesc" placeholder="请输入标签描述（可选）"></textarea>
+        </div>
+      </form>
+    </div>
+    <div class="modal-footer">
+      <button class="btn" onclick="closeTagModal()">取消</button>
+      <button class="btn btn-accent" onclick="saveTag()">保存</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== 移动API弹窗 ===== -->
+<div class="modal-overlay" id="moveModal">
+  <div class="modal">
+    <div class="modal-header">
+      <h3>移动 API</h3>
+      <button class="modal-close" onclick="closeMoveModal()"><i class="fas fa-times"></i></button>
+    </div>
+    <div class="modal-body">
+      <form id="moveForm">
+        <input type="hidden" id="moveApiId">
+        <div class="form-group">
+          <label class="form-label">
+            选择标签 <span class="required">*</span>
+          </label>
+          <div class="tag-selector" id="tagSelector">
+            <!-- 标签选项将通过JavaScript动态生成 -->
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">操作方式</label>
+          <div class="radio-group">
+            <label class="radio-option">
+              <input type="radio" name="moveType" value="add" checked>
+              <span>添加到新标签（保留原标签）</span>
+            </label>
+            <label class="radio-option">
+              <input type="radio" name="moveType" value="move">
+              <span>移动到新标签（移除原标签）</span>
+            </label>
+          </div>
+        </div>
+      </form>
+    </div>
+    <div class="modal-footer">
+      <button class="btn" onclick="closeMoveModal()">取消</button>
+      <button class="btn btn-accent" onclick="confirmMove()">确认移动</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== 功能描述面板 ===== -->
+<div class="features-panel" id="featuresPanel">
+  <div class="features-panel-header">
+    <h2>功能特性</h2>
+    <button class="modal-close" onclick="toggleFeatures()"><i class="fas fa-times"></i></button>
+  </div>
+  <div class="features-content">
+    <div class="feature-section">
+      <h3><i class="fas fa-star"></i> 核心功能</h3>
+      <ul class="feature-list">
+        <li><span class="fi">•</span> <strong>API 管理</strong> - 添加、编辑、删除 API</li>
+        <li><span class="fi">•</span> <strong>标签分类</strong> - 按标签组织和筛选 API</li>
+        <li><span class="fi">•</span> <strong>多视图切换</strong> - 卡片视图和表格视图</li>
+        <li><span class="fi">•</span> <strong>搜索功能</strong> - 快速查找 API</li>
+        <li><span class="fi">•</span> <strong>导入导出</strong> - 数据备份和恢复</li>
+      </ul>
+    </div>
+    <div class="feature-section">
+      <h3><i class="fas fa-shield-alt"></i> 安全特性</h3>
+      <ul class="feature-list">
+        <li><span class="fi">•</span> <strong>API Key 保护</strong> - 默认隐藏 API Key</li>
+        <li><span class="fi">•</span> <strong>本地存储</strong> - 数据存储在本地浏览器</li>
+      </ul>
+    </div>
+    <div class="feature-section">
+      <h3><i class="fas fa-mobile-alt"></i> 响应式设计</h3>
+      <ul class="feature-list">
+        <li><span class="fi">•</span> <strong>适配各种设备</strong> - 桌面端、平板、手机</li>
+        <li><span class="fi">•</span> <strong>流畅动画</strong> - 平滑的过渡效果</li>
+      </ul>
+    </div>
+    <div class="feature-highlight">
+      <strong>提示：</strong> 所有数据都存储在本地浏览器的 localStorage 中，不会上传到任何服务器。请定期使用导出功能备份数据。
+    </div>
+  </div>
+</div>
+
+<!-- ===== 功能描述切换按钮 ===== -->
+<button class="fab-features" onclick="toggleFeatures()"><i class="fas fa-info"></i></button>
+
+<!-- ===== Toast 容器 ===== -->
+<div class="toast-container" id="toastContainer"></div>
+
+<script src="js/script.js"></script>
+</body>
+</html>
